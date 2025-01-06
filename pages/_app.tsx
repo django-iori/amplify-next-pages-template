@@ -5,13 +5,16 @@ import type { AppProps } from "next/app";
 import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 import "@aws-amplify/ui-react/styles.css";
+import { ThemeProvider } from '@aws-amplify/ui-react';
 
 Amplify.configure(outputs);
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
+    <ThemeProvider>
     <Authenticator>
       <Component {...pageProps} />;
     </Authenticator>
+    </ThemeProvider>
   )
 }

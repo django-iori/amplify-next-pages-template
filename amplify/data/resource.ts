@@ -6,15 +6,40 @@ adding a new "isDone" field as a boolean. The authorization rule below
 specifies that any user authenticated via an API key can "create", "read",
 "update", and "delete" any "Todo" records.
 =========================================================================*/
-const schema = a.schema({
-  Todo: a
-    .model({
-      content: a.string(),
-    }).authorization(allow => [allow.owner()]),
-});
 
+// スキーマの定義と認可ルールの設定
+const schema = a.schema({
+  Quiz: a.model({
+    // 1. Create a reference field
+    genre_code: a.id(),
+    question: a.string(),
+    options1: a.string(),
+    options2: a.string(),
+    options3: a.string(),
+    options4: a.string(),
+    answer: a.string(),
+    Result: a.string(),
+    creation_date: a.date(),
+    reporting_date: a.date(),
+    yobi1: a.string(),
+    yobi2: a.string(),
+    yobi3: a.string(),    
+    // 2. Create a belongsTo relationship with the reference field
+    genre: a.belongsTo('Genre', 'genre_code')
+  }),
+
+  Genre: a.model({
+    genre: a.string(),
+    // 3. Create a hasMany relationship with the reference field
+    //    from the `Genre`s model.
+    quiz: a.hasMany('Quiz', 'genre_code'),
+  }),
+}).authorization(allow => [allow.owner()])
+
+// スキーマの型定義をエクスポート（お作法）
 export type Schema = ClientSchema<typeof schema>;
 
+// データベーススキーマと認可モードの設定
 export const data = defineData({
   schema,
   authorizationModes: {

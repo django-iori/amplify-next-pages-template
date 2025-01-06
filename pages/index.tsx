@@ -1,56 +1,33 @@
-import { useState, useEffect } from "react";
-import { generateClient } from "aws-amplify/data";
-import type { Schema } from "@/amplify/data/resource";
-import { useAuthenticator } from "@aws-amplify/ui-react";
+import React from 'react'; 
+import { BrowserRouter as Router, Route, Routes, Link, useNavigate, useParams, Navigate } from 'react-router-dom'; 
+import { Flex, View, Button, Text } from '@aws-amplify/ui-react'; 
+import '@aws-amplify/ui-react/styles.css'; 
+import Home from './Home'; 
+import Quiz from './Quiz'; 
+import Result from './Result';
+import TotalResult from './TotalResult';
 
-const client = generateClient<Schema>();
+const App = () => ( 
+  <Router>
+    <Routes> 
+      <Route path="/" element={<Home />} /> 
+      <Route path="/this-week/*" element={<QuizRoutes basePath="this-week" />} /> 
+      <Route path="/last-week/*" element={<QuizRoutes basePath="last-week" />} /> 
+      <Route path="/week-before-last/*" element={<QuizRoutes basePath="week-before-last" />} /> 
+      <Route path="/total-result" element={<TotalResult />} />
+    </Routes> 
+  </Router> 
+  ); 
 
-export default function App() {
-  const { user, signOut } = useAuthenticator();
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+const QuizRoutes: React.FC<{ basePath: string }> = ({ basePath }) => (
+  <Routes> 
+    <Route path="/" element={<Navigate to={`/${basePath}/quiz/1`} replace />} />
+    {Array.from({ length: 10 }, (_, i) => (
+      <Route key={i + 1} path={`/quiz/${i + 1}`} element={<Quiz title={`第${i + 1}問`} questionNumber={i + 1} basePath={basePath} />} /> 
+    ))} 
+    {Array.from({ length: 10 }, (_, i) => (
+      <Route key={i + 1} path={`result/:questionNumber/:answer`} element={<Result basePath={basePath} />} /> 
+    ))} 
+  </Routes> );
   
-
-  function listTodos() {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
-    });
-  }
-
-  useEffect(() => {
-    listTodos();
-  }, []);
-
-  function createTodo() {
-    client.models.Todo.create({
-      content: window.prompt("Todo content"),
-    });
-  }
-    
-  function deleteTodo(id: string) {
-    client.models.Todo.delete({ id })
-  }
-
-  return (
-    <main>
-      <h1>{user?.signInDetails?.loginId} todos</h1>
-      <button onClick={createTodo}>+ new</button>
-      <ul>
-        {todos.map((todo) => (
-          <li
-          onClick={() => deleteTodo(todo.id)}
-          key={todo.id}>
-          {todo.content}
-          </li>
-        ))}
-      </ul>
-      <div>
-        🥳 App successfully hosted. Try creating a new todo.
-        <br />
-        <a href="https://docs.amplify.aws/gen2/start/quickstart/nextjs-pages-router/">
-          Review next steps of this tutorial.
-        </a>
-      </div>
-      <button onClick={signOut}>Sign out</button>
-    </main>
-  );
-}
+export default App
