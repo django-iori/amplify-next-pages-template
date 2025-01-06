@@ -3,8 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Flex, Text, Button } from '@aws-amplify/ui-react';
 
 interface ResultParams {
-  questionNumber: string;
-  answer: string;
+  questionNumber: string | undefined;
+  answer: string | undefined;
 }
 
 interface ResultProps { 
@@ -12,12 +12,12 @@ interface ResultProps {
 }
 
 const Result: React.FC<ResultProps> = ({ basePath }) => {
-  const params = useParams<ResultParams>(); 
+  const params = useParams<Record<string, string | undefined>>();
   const navigate = useNavigate(); 
 
   console.log("params: ", params);
   
-  const questionNumber = parseInt(params.questionNumber, 10);
+  const questionNumber = parseInt(params.questionNumber || "0", 10);
   const answer = params.answer
 
   const handleNextQuestion = () => {
