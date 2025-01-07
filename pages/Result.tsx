@@ -14,9 +14,6 @@ interface ResultProps {
 const Result: React.FC<ResultProps> = ({ basePath }) => {
   const params = useParams<Record<string, string | undefined>>();
   const navigate = useNavigate(); 
-
-  console.log("params: ", params);
-  
   const questionNumber = parseInt(params.questionNumber || "0", 10);
   const answer = params.answer
 
